@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: alert-message
+Transform:
+- AWS::Serverless-2016-10-31
+Resources:
+  AlertMessageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Role: arn:aws:iam::850130103126:role/service-role/IoTDynamo
+      Handler: src/handlers/alert-message.PhoneAlertHandler
+      Runtime: nodejs12.x
+      MemorySize: 128
+      Timeout: 100
+      Description: A Lambda function that returns a static string.
+      Events:
+        AlertMessageApi:
+          Type: Api
+          Properties:
+            Path: /
+            Method: GET
+      Policies:
+      - SNSPublishMessagePolicy:
+          TopicName:
+            Fn::GetAtt:
+            - AlertMessage
+            - TopicName
+      Environment:
+        Variables:
+          SNS_TOPIC_ARN:
+            Ref: AlertMessageTopic
+      CodeUri: s3://falldetector-01/949ef1f3825ea77aa6a8c26b48234107
+  AlertMessageTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      Subscription:
+      - Endpoint: constanzajazme@gmail.com
+        Protocol: email

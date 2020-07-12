@@ -1,0 +1,48 @@
+# This is the SAM template that represents the architecture of your serverless application
+# https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-template-basics.html
+
+# The AWSTemplateFormatVersion identifies the capabilities of the template
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/format-version-structure.html
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  alert-message
+
+# Transform section specifies one or more macros that AWS CloudFormation uses to process your template
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html
+Transform:
+- AWS::Serverless-2016-10-31
+
+# Resources declares the AWS resources that you want to include in the stack
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
+Resources:
+  # Each Lambda function is defined by properties:
+  # https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+
+  # This is a Lambda function config associated with the source code: hello-from-lambda.js
+  AlertMessageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Role: arn:aws:iam::850130103126:role/service-role/IoTDynamo
+      Handler: src/handlers/alert-message.PhoneAlertHandler
+      Runtime: nodejs12.x
+      MemorySize: 128
+      Timeout: 100
+      Description: A Lambda function that returns a static string.
+      Events:
+        AlertMessageApi:
+          Type: Api
+          Properties:
+            Path: /
+            Method: GET
+      Policies:
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt AlertMessage.TopicName
+      Environment:
+        Variables:
+          SNS_TOPIC_ARN: !Ref AlertMessageTopic
+  AlertMessageTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        Subscription:
+          - Endpoint: constanzajazme@gmail.com
+            Protocol: email

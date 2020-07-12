@@ -1,0 +1,9 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "falldetector"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-6sbz7uz8myid"
+s3_prefix = "falldetector"
+region = "us-east-1"
+capabilities = "CAPABILITY_IAM"
