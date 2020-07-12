@@ -1,13 +1,15 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
+Globals:
+  Function:
+    Runtime: nodejs12.x
+    MemorySize: 128
+    Timeout: 100
 Resources:
   AlertMessageFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: src/handlers/alert-message.handler
-      Runtime: nodejs12.x
-      MemorySize: 128
-      Timeout: 100
+      Handler: src/handlers/alert-message.EmailAlerthandler
       Description: A Lambda function that send a email.
       Events:
         AlertMessageApi:
@@ -25,10 +27,23 @@ Resources:
         Variables:
           SNS_TOPIC_ARN:
             Ref: AlertMessageTopic
-      CodeUri: s3://falldetector-01/dcce8c6cdbc78fc6dd9262ea53b3b61c
+      CodeUri: s3://falldetector-01/647284bad89f09bce5970780c6955a44
   AlertMessageTopic:
     Type: AWS::SNS::Topic
     Properties:
       Subscription:
       - Endpoint: constanzajazme@gmail.com
         Protocol: email
+  AlertPhoneMessageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: A Lambda function that send a SMS.
+      Handler: src/handlers/alert-message.PhoneAlertHandler
+      Runtime: nodejs12.x
+      Events:
+        AlertPhoneMessage:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get
+      CodeUri: s3://falldetector-01/647284bad89f09bce5970780c6955a44

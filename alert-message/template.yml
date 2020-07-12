@@ -33,16 +33,15 @@ Resources:
         - Endpoint: constanzajazme@gmail.com
           Protocol: email
 
-  AlertPhoneFunction:
-    Type: AWS::Serverless::Function
+  AlertPhoneMessageFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      Handler: src/handlers/alert-message.PhoneAlerthandler
       Description: A Lambda function that send a SMS.
+      Handler: src/handlers/alert-message.PhoneAlertHandler
+      Runtime: nodejs12.x
       Events:
-        AlertPhoneApi:
-          Type: Api
+        AlertPhoneMessage:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /sender
-            Method: POST
-      Policies:
-        - AWSLambdaBasicExecutionRole
+            Path: /hello
+            Method: get

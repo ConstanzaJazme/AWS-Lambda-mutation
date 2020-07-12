@@ -1,3 +1,4 @@
+const axios = require('axios')
 /**
  * A Lambda function that send a SMS.  From: https://github.com/SamWSoftware/ServerlessYoutubeSeries.git
  */
@@ -6,32 +7,20 @@ AWS.config.update({region: 'us-east-2'});
 
 const SNS = new AWS.SNS({ apiVersion: '2010-03-31' });
 const Responses = require('../Responses');
+const url = process.env.IFTTT_URL;
 
 exports.PhoneAlertHandler = async (event, context) => {
-    const body = JSON.parse(event.body);
-
-    if (!body || !body.phoneNumber || !body.message) {
-        return Responses._400({ message: 'missing phone number or messsage from the body' });
+    const config = {
+        method: 'get',
+        url: url
     }
 
-    const AttributeParams = {
-        attributes: {
-            DefaultSMSType: 'Promotional',
-        },
-    };
-
-    const messageParams = {
-        Message: body.message,
-        PhoneNumber: body.phoneNumber,
-    };
-
     try {
-        await SNS.setSMSAttributes(AttributeParams).promise();
-        await SNS.publish(messageParams).promise();
+        const request = await axios(config);
         return Responses._200({ message: 'Texto enviado' });
-    } catch (error) {
-        console.log('error', error);
-        return Responses._400({ message: JSON.stringify(error) });
+    } catch (err) {
+        console.log(err);
+        return err;
     }
 }
 
@@ -40,7 +29,7 @@ exports.PhoneAlertHandler = async (event, context) => {
  */
 exports.EmailAlerthandler = async function(event, context) {
     const params = {
-      Message: event.message,
+      Message: "Hola desde AWS",
       Subject: 'Notificación desde FallDetector',
       TopicArn: process.env.SNS_TOPIC_ARN
     };
@@ -48,7 +37,7 @@ exports.EmailAlerthandler = async function(event, context) {
     try {
       await SNS.publish(params).promise()
       return Responses._200({ message: 'Texto enviado' });
-    } catch(err) {
+    } catch(error) {
         return Responses._400({ message: JSON.stringify(error) });
     }
 };
